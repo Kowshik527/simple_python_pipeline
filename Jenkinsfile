@@ -16,21 +16,21 @@ pipeline {
                 sh 'source venv/bin/activate'
                 
                 // Install dependencies
-                sh 'pip install -r requirements.txt'
+                sh './venv/bin/pip install -r requirements.txt' // Use full path to pip
             }
         }
         
         stage('Test') {
             steps {
                 // Run tests
-                sh 'python tests.py'
+                sh './venv/bin/python tests.py' // Use full path to python
             }
         }
         
         stage('Deploy') {
             steps {
                 // Run the Flask app
-                sh 'python app.py'
+                sh './venv/bin/python app.py' // Use full path to python
             }
         }
     }
