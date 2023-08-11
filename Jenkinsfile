@@ -1,3 +1,5 @@
+#!/bin/bash
+
 pipeline {
     agent any
     
@@ -12,25 +14,25 @@ pipeline {
         stage('Build') {
             steps {
                 // Set up your virtual environment
-                sh 'python -m venv venv'
+                sh './venv/bin/python -m venv venv'
                 sh 'source venv/bin/activate'
                 
                 // Install dependencies
-                sh './venv/bin/pip install -r requirements.txt' // Use full path to pip
+                sh './venv/bin/pip install -r requirements.txt'
             }
         }
         
         stage('Test') {
             steps {
                 // Run tests
-                sh './venv/bin/python tests.py' // Use full path to python
+                sh './venv/bin/python tests.py'
             }
         }
         
         stage('Deploy') {
             steps {
                 // Run the Flask app
-                sh './venv/bin/python app.py' // Use full path to python
+                sh './venv/bin/python app.py'
             }
         }
     }
