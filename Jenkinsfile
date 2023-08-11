@@ -14,7 +14,7 @@ pipeline {
                     
                     
                     // Install dependencies
-                    sh 'usr/bin/pip install -r requirements.txt'
+                    sh '/usr/lib/python3/dist-packages/pip install -r requirements.txt'
                 }
             }
             
