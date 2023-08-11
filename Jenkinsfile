@@ -1,20 +1,12 @@
 pipeline {
     agent any
     
+    tools {
+        // Define the tool installation for Python3
+        python3 'Python3'
+    }
+    
     stages {
-        stage('Check Python') {
-            steps {
-                script {
-                    def pythonTool = 'Python3'
-                    def pythonVersion = '3.8'
-                    def pythonInstalled = tool name: pythonTool, type: 'hudson.plugins.python.PythonInstaller'
-                    if (!pythonInstalled) {
-                        error('Python is not installed. Please configure Python tool in Jenkins settings.')
-                    }
-                }
-            }
-        }
-        
         stage('Checkout') {
             steps {
                 // Checkout your source code from your version control system (e.g., Git)
@@ -26,12 +18,9 @@ pipeline {
             steps {
                 // Set up your virtual environment
                 script {
-                    def pythonTool = 'Python3'
-                    def pythonVersion = '3.8'
-                    def pythonPath = tool name: pythonTool, type: 'hudson.plugins.python.PythonInstaller'
-                    sh "${pythonPath}/bin/python3 -m venv venv"
+                    sh 'python3 -m venv venv'
+                    sh 'source venv/bin/activate'
                 }
-                sh 'source venv/bin/activate'
                 
                 // Install dependencies
                 sh 'pip install -r requirements.txt'
@@ -41,22 +30,14 @@ pipeline {
         stage('Test') {
             steps {
                 // Run tests
-                script {
-                    def pythonTool = 'Python3'
-                    def pythonPath = tool name: pythonTool, type: 'hudson.plugins.python.PythonInstaller'
-                    sh "${pythonPath}/bin/python3 tests.py"
-                }
+                sh 'python3 tests.py'
             }
         }
         
         stage('Deploy') {
             steps {
                 // Run the Flask app
-                script {
-                    def pythonTool = 'Python3'
-                    def pythonPath = tool name: pythonTool, type: 'hudson.plugins.python.PythonInstaller'
-                    sh "${pythonPath}/bin/python3 app.py"
-                }
+                sh 'python3 app.py'
             }
         }
     }
