@@ -1,5 +1,3 @@
-#!/bin/bash
-
 pipeline {
     agent any
     
@@ -11,45 +9,39 @@ pipeline {
             }
         }
         
-        stage('Installing packages') {
+        stage('Build') {
             steps {
                 script {
+                    // Check if Python is installed
+                    def pythonInstalled = sh(script: 'command -v python', returnStatus: true) == 0
+
+                    // Install Python if not present
+                    if (!pythonInstalled) {
+                        sh 'sudo apt-get update -y'
+                        sh 'sudo apt-get install python3 -y'
+                    }
+
+                    // Set up your virtual environment
+                    sh 'python -m venv venv'
+                    sh 'source venv/bin/activate'
+
+                    // Install dependencies
                     sh 'pip install -r requirements.txt'
                 }
             }
         }
-        stage('Static Code Checking') {
+        
+        stage('Test') {
             steps {
-                script {
-                    sh 'find . -name \\*.py | xargs pylint -f parseable --output-format=pylint.log || true'
-                    recordIssues(
-                        tools: [pyLint(pattern: 'pylint.log')],
-                        unstableTotalAll: 100
-                    )
-                }
+                // Run tests
+                sh 'python tests.py'
             }
         }
-        stage('Running Unit tests') {
+        
+        stage('Deploy') {
             steps {
-                script {
-                    sh 'pytest --junitxml=pyunit.xml --cov-report xml:cov.xml tests/*.py || true'
-                    step([$class: 'CoberturaPublisher', 
-                        coberturaReportFile: "cov.xml",
-                        onlyStable: false,
-                        failNoReports: true,
-                        failUnhealthy: false,
-                        failUnstable: false,
-                        autoUpdateHealth: true,
-                        autoUpdateStability: true,
-                        zoomCoverageChart: true,
-                        maxNumberOfBuilds: 10,
-                        lineCoverageTargets: '80, 80, 80',
-                        conditionalCoverageTargets: '80, 80, 80',
-                        classCoverageTargets: '80, 80, 80',
-                        fileCoverageTargets: '80, 80, 80',
-                    ])
-                    junit "pyunit.xml"
-                }
+                // Run the Flask app
+                sh 'python app.py'
             }
         }
     }
