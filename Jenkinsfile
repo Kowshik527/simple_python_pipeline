@@ -9,14 +9,14 @@ pipeline {
             }
         }
         
-        stage('Build') {
-                steps {
+        // stage('Build') {
+        //         steps {
                     
                     
-                    // Install dependencies
-                    sh '/usr/lib/python3/dist-packages/pip install -r requirements.txt'
-                }
-            }
+        //             // Install dependencies
+        //             sh '/usr/lib/python3/dist-packages/pip install -r requirements.txt'
+        //         }
+        //     }
             
             stage('Test') {
                 steps {
