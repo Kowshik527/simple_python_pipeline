@@ -11,28 +11,45 @@ pipeline {
             }
         }
         
-        stage('Build') {
+        stage('Installing packages') {
             steps {
-                // Set up your virtual environment
-                sh './venv/bin/python -m venv venv'
-                sh 'source venv/bin/activate'
-                
-                // Install dependencies
-                sh './venv/bin/pip install -r requirements.txt'
+                script {
+                    sh 'pip install -r requirements.txt'
+                }
             }
         }
-        
-        stage('Test') {
+        stage('Static Code Checking') {
             steps {
-                // Run tests
-                sh './venv/bin/python tests.py'
+                script {
+                    sh 'find . -name \\*.py | xargs pylint -f parseable --output-format=pylint.log || true'
+                    recordIssues(
+                        tools: [pyLint(pattern: 'pylint.log')],
+                        unstableTotalAll: 100
+                    )
+                }
             }
         }
-        
-        stage('Deploy') {
+        stage('Running Unit tests') {
             steps {
-                // Run the Flask app
-                sh './venv/bin/python app.py'
+                script {
+                    sh 'pytest --junitxml=pyunit.xml --cov-report xml:cov.xml tests/*.py || true'
+                    step([$class: 'CoberturaPublisher', 
+                        coberturaReportFile: "cov.xml",
+                        onlyStable: false,
+                        failNoReports: true,
+                        failUnhealthy: false,
+                        failUnstable: false,
+                        autoUpdateHealth: true,
+                        autoUpdateStability: true,
+                        zoomCoverageChart: true,
+                        maxNumberOfBuilds: 10,
+                        lineCoverageTargets: '80, 80, 80',
+                        conditionalCoverageTargets: '80, 80, 80',
+                        classCoverageTargets: '80, 80, 80',
+                        fileCoverageTargets: '80, 80, 80',
+                    ])
+                    junit "pyunit.xml"
+                }
             }
         }
     }
