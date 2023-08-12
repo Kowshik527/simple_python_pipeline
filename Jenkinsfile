@@ -9,28 +9,28 @@ pipeline {
             }
         }
         
-        // stage('Build') {
-        //         steps {
-                    
-                    
-        //             // Install dependencies
-        //             sh '/usr/lib/python3/dist-packages/pip install -r requirements.txt'
-        //         }
-        //     }
-            
-            stage('Test') {
+        stage('Build') {
                 steps {
-                    // Run tests
-                    sh '/usr/bin/python3 tests.py'
+                    
+                    
+                    // Install dependencies
+                    sh '/usr/bin/python3 -m pip install -r requirements.txt'
                 }
             }
             
-            stage('Deploy') {
-                steps {
-                    // Run the Flask app
-                    sh '/usr/bin/python3 app.py'
-                }
-            }
+            // stage('Test') {
+            //     steps {
+            //         // Run tests
+            //         sh '/usr/bin/python3 tests.py'
+            //     }
+            // }
+            
+            // stage('Deploy') {
+            //     steps {
+            //         // Run the Flask app
+            //         sh '/usr/bin/python3 app.py'
+            //     }
+            // }
 
     }
 }
